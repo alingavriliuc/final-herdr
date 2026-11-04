@@ -1,0 +1,9 @@
+{
+  "layout:final-herdr": {
+    "cmd-e": "fh-hud.cycle",
+    "cmd-alt-1": "fh-hud.world",
+    "cmd-alt-2": "fh-hud.roster",
+    "cmd-alt-3": "fh-hud.combat",
+    "cmd-/": "mod.open:fh-manual"
+  }
+}

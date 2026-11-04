@@ -1,0 +1,84 @@
+{
+  "id": "root",
+  "type": "column",
+  "preview": "layouts/final-herdr.svg",
+  "titlebar": "none",
+  "traffic_lights": [14, 16],
+  "theme": "final-herdr",
+  "font": "JetBrains Mono",
+  "font_size": 14,
+  "ui_font": "DotGothic16",
+  "terminal_padding": [10, 8],
+  "terminal_opacity": 0.9,
+  "background": { "gradient": ["#0d1550", "#03051a"], "angle": 180 },
+  "children": [
+    {
+      "id": "hud",
+      "type": "block",
+      "size": { "px": 44 },
+      "window_drag": true,
+      "content": { "mod": "fh-hud" }
+    },
+    {
+      "id": "body",
+      "type": "row",
+      "padding": [6, 10],
+      "gap": 10,
+      "children": [
+        {
+          "id": "party",
+          "type": "block",
+          "size": { "px": 230 },
+          "min": 72,
+          "max": 380,
+          "content": { "mod": "fh-party" }
+        },
+        {
+          "id": "view",
+          "type": "stack",
+          "active": "combat",
+          "children": [
+            {
+              "id": "world",
+              "type": "block",
+              "content": { "mod": "fh-world" }
+            },
+            {
+              "id": "roster",
+              "type": "block",
+              "content": { "mod": "fh-roster" }
+            },
+            {
+              "id": "combat",
+              "type": "block",
+              "content": {
+                "tab": "active",
+                "pane": {
+                  "gap": 10,
+                  "radius": 8,
+                  "background": "#0a1036",
+                  "lone": true,
+                  "border": { "width": 2, "color": "#aeb4dc" },
+                  "focus": { "width": 2, "color": "#ffffff" },
+                  "header": {
+                    "content": { "mod": "fh-pane" },
+                    "height": 28,
+                    "position": "top",
+                    "reveal": "always"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dialog",
+      "type": "block",
+      "size": { "px": 76 },
+      "padding": [0, 10],
+      "content": { "mod": "fh-dialog" }
+    }
+  ]
+}
