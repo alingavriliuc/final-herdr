@@ -33,7 +33,7 @@ Statuses, everywhere a hero shows:
 Clicks and keys:
 
 - `cmd+E` cycles World → Party → Battle; `cmd+alt+1/2/3` pick one; `cmd+/` opens the manual. The HUD tabs do the same on click.
-- Party column / roster card: click goes to the hero's terminal and switches to Battle; right-click opens the hero menu: **Go**, **Peek** (`terminal.peek`), **Talk** (type an order, sent with `hc send`), **Banner** / **Lower the banner** (pin), **Flee** (confirm, then `terminal.kill`).
+- Party column / roster card: click goes to the hero's terminal and switches to Battle; right-click opens the hero menu: **Go**, **Peek** (`terminal.peek`), **Talk** (type an order, sent with `hc send`), **Rename** (prefilled with the hero's name; renames its tab with `tab.rename`, empty gives the default name back), **Banner** / **Lower the banner** (pin), **Flee** (confirm, then `terminal.kill`).
 - `+ RECRUIT`: the recruit menu lists installed agents as classes (OpenCode first); pick one, type a hero name (empty = default), Enter starts it in a new tab of the active space and switches to Battle.
 - World map: click selects a place; a second click, Enter or `TRAVEL` goes there (selects its space, or creates one for an empty house / unlit fire) and switches to Battle. Arrow keys move the selection. Right-click a campfire or a house: **Travel** / **Settle**, **Build a house** (type a branch: `git worktree add` next to the main checkout as `<main>.<branch>`, then opens a space there), **Demolish** (houses only; checks `git status`, warns about uncommitted changes, closes the house's spaces, `git worktree remove`, keeps the branch). `+ FOUND A ZONE` picks a folder and opens a space.
 - Dialog box click: the quest log, newest first, with relative times.
@@ -53,7 +53,7 @@ Progression (`fh-hud`'s engine, every 2 s): +1 XP per second a class's agents sp
   - `kit.js`: one identical copy in every mod (mods can't import each other): colors, fonts, `box()` (the JRPG window), classes, statuses, `heroName`, `zoneName`, `heroCount`, `designSize`, achievements, the save helpers, `sfx()`.
 - **Shipped mod used**: `pane`'s icons (`mods/pane/split-right.svg`, `split-down`, `zoom`, `unzoom`, `close`) in `fh-pane`.
 - **herdr functions**: `spaces`, `agents`, `panes`, `layout`, `run`, `nextCommand`, `shared` / `setShared` (`fh.save`, `fh.world.changed`), `openOverlay` / `closeOverlay`, `props`, `knownAgents`, `setAgentOrder`, `notify`, `exec`, `hc`, `home`, `pickFolder`, `playSound`, `settings`.
-- **Commands**: `layout.select`, `mod.open`, `app.settings`, `agent.focus`, `terminal.peek`, `terminal.pin`, `terminal.kill`, `tab.new {name, space, argv}`, `tab.select`, `space.new {folder, machine}`, `space.select`, `space.close {id, confirmed}`, `pane.focus`, `pane.split`, `pane.zoom`, `pane.close`, and its own `fh-hud.cycle|world|roster|combat`.
+- **Commands**: `layout.select`, `mod.open`, `app.settings`, `agent.focus`, `terminal.peek`, `terminal.pin`, `terminal.kill`, `tab.new {name, space, argv}`, `tab.select`, `tab.rename {id, name}`, `space.new {folder, machine}`, `space.select`, `space.close {id, confirmed}`, `pane.focus`, `pane.split`, `pane.zoom`, `pane.close`, and its own `fh-hud.cycle|world|roster|combat`.
 - **Programs**: `git` (`rev-parse --path-format=absolute --show-toplevel --git-common-dir`, `worktree list --porcelain` every 30 s and on change, `show-ref`, `worktree add`, `worktree remove`, `status --porcelain`), `hc send`. All through `exec` / `hc`, on the space's machine when it's remote.
 - **Art**: 16×16 pixel grids rendered to outlined SVGs by `fh-party/art/portraits.py` (6 portraits) and `fh-world/art/tiles.py` (17 tiles); 7 chiptune MP3s (square and triangle voices) by `fh-hud/art/sounds.py` (needs ffmpeg). Fonts: DotGothic16 and Press Start 2P (OFL), in `fh-hud/fonts`.
 
@@ -65,6 +65,7 @@ Progression (`fh-hud`'s engine, every 2 s): +1 XP per second a class's agents sp
 - **Class names are save keys** (`fh.save.classes[<name>]`). Renaming a class orphans its XP; `kit.js` maps the earlier French names (`LEGACY`) so old saves keep their progress.
 - Art file names are French (`ingenieur.svg`, `feu.svg`, `maison-ville-vide.svg`…). They're identifiers only, never shown.
 - The title screen must show once per app launch, not on every hot reload: a `globalThis` flag survives reloads.
+- `pickFolder` keeps the Finder panel open while the map may re-render: spawn that task with `{ owner: null }` so it outlives the view, or the chosen folder is dropped silently.
 - Herdr rewrites `shared.json` from memory while it runs: edit it (to import a save) only with Herdr closed.
 - `levelup.mp3` exists but isn't played; a level-up uses `victory`.
 - A hero's name is its tab's name, else its space's, else `Wanderer`.

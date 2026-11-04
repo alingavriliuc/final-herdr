@@ -1,5 +1,5 @@
 // FINAL HERDR's command menu: a JRPG window at the pointer.
-// mode "hero": Go / Peek / Talk / Banner / Flee for one agent.
+// mode "hero": Go / Peek / Talk / Rename / Banner / Flee for one agent.
 // mode "recruit": pick a class (an installed agent), name the hero, start it.
 // mode "site": a worktree on the world map (the campfire or a house): travel,
 // build a new worktree (a house), or tear a house down (git worktree remove).
@@ -110,6 +110,7 @@ export default class FhMenu extends View {
       { label: "Go", hint: "join the battle", act: () => { this.close(); run("agent.focus", { terminal: p.terminal }); run("fh-hud.combat"); } },
       { label: "Peek", hint: "take a look", act: () => { this.close(); run("terminal.peek", { terminal: p.terminal }); } },
       { label: "Talk", hint: "send an order", act: (cx) => this.enter("talk", cx) },
+      ...(p.tab ? [{ label: "Rename", hint: "give a new name", act: (cx) => this.enter("rename", cx) }] : []),
       { label: p.pinned ? "Lower the banner" : "Banner", hint: p.pinned ? "unpin" : "pin to the top", act: () => { this.close(); run("terminal.pin", { terminal: p.terminal, pinned: !p.pinned }); } },
       { label: "Flee", hint: "stop this hero", color: C.red, act: (cx) => this.enter("flee", cx) },
     ];
@@ -140,7 +141,9 @@ export default class FhMenu extends View {
     this.sel = 0;
     this.error = "";
     if (mode === "demolish") this.checkDirty(cx);
-    if (mode === "talk" || mode === "name" || mode === "build") { this.input.set_value?.(""); this.input.focus(); }
+    if (mode === "talk" || mode === "name" || mode === "build" || mode === "rename") {
+      this.input.set_value?.(mode === "rename" ? (props()?.name ?? "") : ""); this.input.focus();
+    }
     else this.handle.focus();
     cx.notify();
   }
@@ -155,6 +158,10 @@ export default class FhMenu extends View {
         const r = await hc(["send", p.terminal, text]);
         if (r.code !== 0) notify({ title: `${p.name} isn't listening`, body: (r.stderr || r.stdout).trim(), level: "warning" });
       });
+    } else if (this.mode === "rename") {
+      this.close();
+      // An empty name gives the tab Herdr's automatic name back.
+      run("tab.rename", { id: p.tab, name: text });
     } else if (this.mode === "build") {
       if (!text || this.busy) return;
       this.build(cx, text);
@@ -172,7 +179,7 @@ export default class FhMenu extends View {
       if (this.mode === "main" || this.mode === "recruit" || this.mode === "site") return this.close();
       return this.enter({ name: "recruit", build: "site", demolish: "site" }[this.mode] ?? "main", cx);
     }
-    if (this.mode === "talk" || this.mode === "name" || this.mode === "build") return;
+    if (this.mode === "talk" || this.mode === "name" || this.mode === "build" || this.mode === "rename") return;
     const items = this.items();
     if (!items.length) return;
     if (e.key === "down") { this.sel = (this.sel + 1) % items.length; sfx("cursor"); cx.notify(); }
@@ -197,7 +204,7 @@ export default class FhMenu extends View {
 
   header() {
     const p = props() ?? {};
-    const title = { main: p.name, flee: "Flee?", talk: `Talk to ${p.name}`, recruit: "RECRUIT", name: "Hero's name",
+    const title = { main: p.name, flee: "Flee?", talk: `Talk to ${p.name}`, rename: `Rename ${p.name}`, recruit: "RECRUIT", name: "Hero's name",
       site: p.branch, build: "Build a house", demolish: `Demolish ${p.branch}?` }[this.mode];
     const site = this.mode === "site" || this.mode === "build" || this.mode === "demolish";
     return h_flex().gap(10).items_center().pb(8).mb(4).border_b(1).border_color(C.edgeDim)
@@ -215,8 +222,8 @@ export default class FhMenu extends View {
 
   body() {
     const err = this.error ? div().px(4).text_size(12).text_color(C.red).child(this.error) : null;
-    if (this.mode === "talk" || this.mode === "name" || this.mode === "build") {
-      const hint = { talk: "Enter to send · Esc to go back", name: "Enter to recruit (empty: default name) · Esc",
+    if (this.mode === "talk" || this.mode === "name" || this.mode === "build" || this.mode === "rename") {
+      const hint = { talk: "Enter to send · Esc to go back", rename: "Enter to rename (empty: default name) · Esc", name: "Enter to recruit (empty: default name) · Esc",
         build: this.busy ? "Building…" : "Branch name (existing or new) · Enter · Esc" }[this.mode];
       return v_flex().gap(8)
         .child(Input.new(this.input).h(32).px(8).rounded(4).border(1).border_color(C.edge).bg("#03051a99")

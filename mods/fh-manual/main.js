@@ -28,6 +28,7 @@ const MENU = [
   ["Go", "join the agent in the Battle view"],
   ["Peek", "take a look at its terminal"],
   ["Talk", "send it an order (not while it's blocked)"],
+  ["Rename", "give its quest (tab) a new name; empty: the default name"],
   ["Banner", "pin it to the top of the party"],
   ["Flee", "stop the agent (asks first)"],
 ];

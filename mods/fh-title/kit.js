@@ -106,8 +106,8 @@ export function openHeroMenu(openOverlay, a, at) {
   }
   const cls = classOf(a.program, a.app);
   return openOverlay({
-    mod: "fh-menu", kind: "popup", frame: "none", width: 260, height: 232, at,
-    props: { mode: "hero", terminal: a.address, name: heroName(a), cls: cls.name, art: cls.art, pinned: a.pinned, status: a.status },
+    mod: "fh-menu", kind: "popup", frame: "none", width: 260, height: 260, at,
+    props: { mode: "hero", terminal: a.address, tab: a.tab, name: heroName(a), cls: cls.name, art: cls.art, pinned: a.pinned, status: a.status },
   });
 }
 

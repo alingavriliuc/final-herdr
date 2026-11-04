@@ -8,7 +8,7 @@
 // demolish one (fh-menu). The side panel lists the settlement's worktrees and quests.
 import { View, div, image, PathBuilder, Background } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { spaces, agents, panes, run, home, pickFolder, exec, openOverlay, shared } from "herdr";
+import { spaces, agents, panes, run, home, pickFolder, exec, openOverlay, shared, notify } from "herdr";
 import { C, TITLE, BODY, box, designSize, zoneName, classOf, portraitPath, STATUS } from "./kit.js";
 
 const TILE = 56;
@@ -412,10 +412,16 @@ export default class FhWorld extends View {
         .font_family(TITLE).text_size(8).text_color(C.gold)
         .hover((s) => s.bg("#1a2470"))
         .on_click((_e, cx) => {
+          // owner: null — the task must outlive this view: the map can be rebuilt while the
+          // Finder panel is open, and a cancelled task would drop the chosen folder silently.
           cx.spawn(async () => {
-            const folder = await pickFolder({ prompt: "Found a zone" });
-            if (folder) run("space.new", { folder });
-          });
+            try {
+              const folder = await pickFolder({ prompt: "Found a zone" });
+              if (folder) run("space.new", { folder });
+            } catch (err) {
+              notify({ title: "Found a zone failed", body: String(err?.message ?? err), level: "error" });
+            }
+          }, { owner: null });
         })
         .child("+ FOUND A ZONE"));
   }
